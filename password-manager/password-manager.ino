@@ -40,7 +40,7 @@ void setup() {
   pinMode(btn_pin_2, INPUT);
 }
 
-int menu_item_index = 0;
+int menu_item_index = 1;
 
 void loop() {
   byte btn1_state = digitalRead(btn_pin_1);
@@ -54,7 +54,15 @@ void loop() {
   deserializeJson(doc, password);
   for (JsonObject elem : doc.as<JsonArray>()) {
     String menu_item_name = elem["name"];
-    u8g2.drawStr( 0, render_menu, menu_item_name.c_str());
+    int index = elem["id"];
+    if(index == menu_item_index){
+      String display_value = ">" + menu_item_name;
+      u8g2.drawStr( 0, render_menu, display_value.c_str());
+    }
+    else{
+      String display_value = " " + menu_item_name;
+      u8g2.drawStr( 0, render_menu, display_value.c_str());
+    }
     render_menu+=8;
   }
 
@@ -65,11 +73,18 @@ void loop() {
     menu_item_index -= 1;
   }
 
+  if(menu_item_index <=0){
+    menu_item_index = 4;
+  }
+  if(menu_item_index >=5){
+    menu_item_index = 1;
+  }
+
   u8g2.setCursor(0, render_menu);
   u8g2.print(menu_item_index);
 
   Serial.println(menu_item_index);
   
   u8g2.sendBuffer();
-  delay(100);
+  delay(80);
 }
